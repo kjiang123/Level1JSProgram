@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hot and Cold Game</title>
+    <style>
+        body {
+            text-align: center;
+            margin: 50px;
+            color: royalblue;
+            /* Text color */
+            background-color: peachpuff;
+            /* Background color */
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            color: royalblue;
+            /* Heading color */
+        }
+
+        #currentGuessDisplay {
+            font-size: 24px;
+            font-weight: bold;
+            color: royalblue;
+            /* Color for the current guess */
+        }
+
+        #guessControls {
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        #guessControls button {
+            margin: 5px;
+            background-color: royalblue;
+            /* Button background color */
+            color: peachpuff;
+            /* Button text color */
+            border: 1px solid royalblue;
+            /* Button border color */
+            padding: 10px 20px;
+            /* Button padding */
+            cursor: pointer;
+            /* Cursor style */
+            font-size: 16px;
+            /* Button text size */
+            border-radius: 5px;
+            /* Button border radius */
+        }
+
+        #buttonContainer {
+            margin-top: 10px;
+        }
+
+        #buttonContainer button {
+            margin: 5px;
+        }
+
+        #logs {
+            margin-top: 20px;
+            text-align: left;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        table {
+            margin: 10px auto;
+            /* Adjust the top and bottom margin */
+            border-collapse: collapse;
+            width: 60%;
+            max-height: 200px;
+            /* Set a maximum height for the table */
+            overflow-y: auto;
+            /* Enable vertical scrolling if needed */
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: royalblue;
+            color: peachpuff;
+        }
+
+        #logs {
+            margin-top: 20px;
+            text-align: left;
+            max-width: 300px;
+            margin: 10px auto;
+            /* Adjusted the margin for centering */
+            height: 150px;
+            overflow-y: auto;
+        }
+
+        #logs label {
+            display: block;
+            text-align: center;
+            /* Center the text */
+            margin-bottom: 5px;
+            /* Added a margin at the bottom of the label */
+        }
+
+        #combinedLog {
+            max-height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Hot and Cold Game</h1>
+    <div>
+        <label for="currentGuess">Current Guess:</label>
+        <span id="currentGuessDisplay">50</span>
+    </div>
+    <div id="buttonContainer">
+        <button onclick="updateGuess(-25)">-25</button>
+        <button onclick="updateGuess(-10)">-10</button>
+        <button onclick="updateGuess(-5)">-5</button>
+        <button onclick="updateGuess(-1)">-1</button>
+        <button onclick="updateGuess(1)">+1</button>
+        <button onclick="updateGuess(5)">+5</button>
+        <button onclick="updateGuess(10)">+10</button>
+        <button onclick="updateGuess(25)">+25</button>
+    </div>
+    <div id="logs">
+        <div>
+            <label for="combinedLog">Log:</label>
+            <ul id="combinedLog"></ul>
+        </div>
+    </div>
+    <div>
+        <label for="remainingGuesses">Guesses Remaining:</label>
+        <span id="remainingGuesses">5</span>
+    </div>
+    <button onclick="commitGuess()">Commit Guess</button>
+    <button onclick="resetGame()">Reset Game</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Range</th>
+                <th>Response</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Within 5</td>
+                <td>Very Hot</td>
+            </tr>
+            <tr>
+                <td>6 - 8</td>
+                <td>Hot</td>
+            </tr>
+            <tr>
+                <td>9 - 15</td>
+                <td>Very Warm</td>
+            </tr>
+            <tr>
+                <td>16 - 20</td>
+                <td>Warm</td>
+            </tr>
+            <tr>
+                <td>21 - 30</td>
+                <td>Cool</td>
+            </tr>
+            <tr>
+                <td>31 - 40</td>
+                <td>Very Cool</td>
+            </tr>
+            <tr>
+                <td>41 - 55</td>
+                <td>Cold</td>
+            </tr>
+            <tr>
+                <td>More than 55 away</td>
+                <td>Very Cold</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+
+        let actualNumber = Math.floor(Math.random() * 100) + 1;
+        let currentGuess = 50;
+        let remainingGuesses = 5;
+        let difference = 0;  // Initialize difference
+
+        function updateGuess(value) {
+            if (remainingGuesses > 0) {
+                currentGuess = Math.max(1, Math.min(100, currentGuess + value));
+                document.getElementById('currentGuessDisplay').textContent = currentGuess;
+            }
+        }
+
+        function commitGuess() {
+            if (remainingGuesses > 0) {
+                const oldDifference = difference;  // Store the previous difference
+                difference = Math.abs(actualNumber - currentGuess);  // Calculate the new difference
+
+                remainingGuesses--;
+                document.getElementById('remainingGuesses').textContent = Math.max(0, remainingGuesses);
+
+                const combinedLog = document.getElementById('combinedLog');
+                const logListItem = document.createElement('li');
+
+                logListItem.textContent = `Guess: ${currentGuess}, Response: `;
+
+                if (difference <= 5) {
+                    logListItem.textContent += 'Very Hot';
+                } else if (difference <= 8) {
+                    logListItem.textContent += 'Hot';
+                } else if (difference <= 15) {
+                    logListItem.textContent += 'Very Warm';
+                } else if (difference <= 20) {
+                    logListItem.textContent += 'Warm';
+                } else if (difference <= 30) {
+                    logListItem.textContent += 'Cool';
+                } else if (difference <= 40) {
+                    logListItem.textContent += 'Very Cool';
+                } else if (difference <= 55) {
+                    logListItem.textContent += 'Cold';
+                } else {
+                    logListItem.textContent += 'Very Cold';
+                }
+
+                combinedLog.appendChild(logListItem);
+
+                if (remainingGuesses === 0 || difference === 0) {
+                    endGame(difference, oldDifference);  // Pass the difference to endGame()
+                }
+            }
+        }
+
+        function resetGame() {
+            actualNumber = Math.floor(Math.random() * 100) + 1;
+            currentGuess = 50;
+            remainingGuesses = 5;
+            difference = 0;  // Reset difference
+
+            // Reset the displayed values
+            document.getElementById('currentGuessDisplay').textContent = currentGuess;
+            document.getElementById('remainingGuesses').textContent = remainingGuesses;
+
+            // Clear the logs
+            const combinedLog = document.getElementById('combinedLog');
+            combinedLog.innerHTML = '';
+        }
+
+        function endGame(currentDifference, previousDifference) {
+            let message = '';
+
+            if (remainingGuesses === 0) {
+                message = 'Game over! You have used all your guesses. The actual number was ' + actualNumber + '.';
+            } else if (currentDifference === 0) {
+                message = 'Congratulations! You guessed the correct number!';
+            } else {
+                message = `Game over! The actual number was ${actualNumber}. Your final guess was ${currentGuess}.`;
+                if (currentDifference < previousDifference) {
+                    message += ' You were getting closer!';
+                } else if (currentDifference > previousDifference) {
+                    message += ' You were getting further away.';
+                }
+            }
+
+            alert(message);
+        }
+    </script>
+</body>
+
+</html>
